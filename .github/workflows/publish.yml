@@ -1,0 +1,36 @@
+name: Publish
+
+# Publishing a GitHub release STAGES the package on npm; nothing goes live
+# until a maintainer approves it with 2FA (npm stage list, then npm stage
+# approve <id>). npm trusted publishing authenticates this workflow over OIDC,
+# so no npm token is stored anywhere. --provenance links the package to the
+# commit it was built from, which n8n requires before it will verify a node.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      # Trusted publishing needs npm 11.5.1 or later; npm stage is newer still.
+      - run: npm install -g npm@latest
+      - name: Release tag must match package.json
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      # @n8n/node-cli's prepublishOnly guard refuses a publish without it.
+      - run: npm stage publish --provenance
+        env:
+          RELEASE_MODE: '1'

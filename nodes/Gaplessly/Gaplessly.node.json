@@ -1,0 +1,21 @@
+{
+  "node": "n8n-nodes-gaplessly.gaplessly",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": [
+    "Productivity",
+    "Sales"
+  ],
+  "resources": {
+    "credentialDocumentation": [
+      {
+        "url": "https://github.com/gaplessly/n8n-nodes-gaplessly#credentials"
+      }
+    ],
+    "primaryDocumentation": [
+      {
+        "url": "https://github.com/gaplessly/n8n-nodes-gaplessly#readme"
+      }
+    ]
+  }
+}
