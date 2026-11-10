@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-gaplessly",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "n8n nodes for Gaplessly: bookings, availability, guests and signed booking events for restaurants, bars and appointment businesses.",
   "license": "MIT",
   "homepage": "https://gaplessly.com/docs/integrations",
