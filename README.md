@@ -21,6 +21,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 | Availability | Check free times for a local date, party size (tables) or service and staff member (appointments) |
 | Booking | Create, Update (time, party size, notes), Cancel, Get Many (a local date range) |
 | Booking, table reservations only | Update Status (seated, completed, no-show, undo a seat), Move Table, Seat Walk-In (a party nobody booked, seated now), Record Check (a till check total for guest spend; never charges anything), Get Checks |
+| Event | Get a booking, guest or till check event by its ID, as Gaplessly sent it (kept 30 days) |
 | Guest | Find (by email, or phone compared by digits), Get Many |
 | Organization | Get |
 | Service, Staff Member | Get Many (appointments) |

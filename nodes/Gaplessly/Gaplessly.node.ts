@@ -45,6 +45,7 @@ export class Gaplessly implements INodeType {
 				options: [
 					{ name: 'Availability', value: 'availability' },
 					{ name: 'Booking', value: 'booking' },
+					{ name: 'Event', value: 'event' },
 					{ name: 'Guest', value: 'guest' },
 					{ name: 'Organization', value: 'organization' },
 					{ name: 'Service', value: 'service' },
@@ -102,6 +103,24 @@ export class Gaplessly implements INodeType {
 				displayOptions: { show: { resource: ['organization'] } },
 				options: [{ name: 'Get', value: 'get', action: 'Get the organization' }],
 				default: 'get',
+			},
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: { show: { resource: ['event'] } },
+				options: [{ name: 'Get', value: 'get', action: 'Get an event', description: 'A booking, guest or till check event by its ID, as Gaplessly sent it (kept for 30 days)' }],
+				default: 'get',
+			},
+			{
+				displayName: 'Event ID',
+				name: 'eventId',
+				type: 'string',
+				required: true,
+				default: '',
+				description: 'The top-level ID of a trigger payload, not data.object.ID',
+				displayOptions: { show: { resource: ['event'] } },
 			},
 			{
 				displayName: 'Operation',
@@ -360,7 +379,9 @@ export class Gaplessly implements INodeType {
 					if ((await engine()) !== 'hospitality') throw new NodeOperationError(this.getNode(), 'This operation works for table bookings only', { itemIndex: i });
 				};
 
-				if (resource === 'organization') {
+				if (resource === 'event') {
+					result = (await gaplesslyRequest.call(this, 'GET', `/events/${encodeURIComponent(param<string>('eventId'))}`)).data as IDataObject;
+				} else if (resource === 'organization') {
 					result = (await gaplesslyRequest.call(this, 'GET', '/organization')).data as IDataObject;
 				} else if (resource === 'availability') {
 					const qs: IDataObject = { date: param<string>('date') };
