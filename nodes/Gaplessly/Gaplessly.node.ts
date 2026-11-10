@@ -238,6 +238,15 @@ export class Gaplessly implements INodeType {
 				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				displayOptions: show('booking', ['moveTable', 'seatWalkIn']),
 			},
+			{
+				displayName: 'Walk-In Source Event ID',
+				name: 'walkInSourceId',
+				type: 'string',
+				required: true,
+				default: '',
+				description: 'A stable ID from the till event that opened the table. Re-running with the same ID returns the first walk-in instead of seating the party twice. Use a new ID for each party.',
+				displayOptions: show('booking', ['seatWalkIn']),
+			},
 			{ displayName: 'Walk-In Party Size', name: 'walkInPartySize', type: 'number', typeOptions: { minValue: 1 }, required: true, default: 2, displayOptions: show('booking', ['seatWalkIn']) },
 			{
 				displayName: 'Walk-In Options',
@@ -248,7 +257,6 @@ export class Gaplessly implements INodeType {
 				displayOptions: show('booking', ['seatWalkIn']),
 				options: [
 					{ displayName: 'Minutes at the Table', name: 'turnMinutes', type: 'number', typeOptions: { minValue: 15 }, default: 90, description: 'Leave unset for the venue default for that party size' },
-					{ displayName: 'Source Event ID', name: 'sourceId', type: 'string', default: '', description: 'The till event that opened the table, so a re-run never seats the party twice' },
 				],
 			},
 			{ displayName: 'Check Number', name: 'checkNumber', type: 'string', required: true, default: '', description: "The till's own check number. Sending it again updates the same check.", displayOptions: show('booking', ['recordCheck']) },
@@ -417,7 +425,10 @@ export class Gaplessly implements INodeType {
 						const options = param<IDataObject>('walkInFields', {});
 						const body: IDataObject = { tableId: param<string>('tableId'), partySize: param<number>('walkInPartySize') };
 						if (options.turnMinutes) body.turnMinutes = options.turnMinutes;
-						const headers = options.sourceId ? { 'Idempotency-Key': idempotencyKey('/walk-ins', String(options.sourceId)) } : undefined;
+						const sourceId = param<string>('walkInSourceId', '').trim();
+						// The API requires an Idempotency-Key here, as for any create.
+						if (!sourceId) throw new NodeOperationError(this.getNode(), 'Enter a Walk-In Source Event ID', { itemIndex: i });
+						const headers = { 'Idempotency-Key': idempotencyKey('/walk-ins', sourceId) };
 						result = (await gaplesslyRequest.call(this, 'POST', '/walk-ins', body, undefined, headers)).data as IDataObject;
 					} else if (operation === 'recordCheck') {
 						await venueOnly();
